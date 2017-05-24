@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
+import "demo/styles/index.less";
 
 const rootEl = document.getElementById("root");
 

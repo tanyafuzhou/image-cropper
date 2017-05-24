@@ -28,7 +28,7 @@ module.exports = {
     // prints more readable module names in the browser console on HMR updates
 
     new HtmlWebpackPlugin({
-      title: "react-express-boilerplate",
+      title: "Image Cropper",
       template: "index.ejs"
     })
   ],

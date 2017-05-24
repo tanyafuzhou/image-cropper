@@ -30,7 +30,7 @@ module.exports = {
       }
     }),
     new HtmlWebpackPlugin({
-      title: "react-express-boilerplate",
+      title: "Image Cropper",
       template: "index.ejs",
       env: "prod"
     })
