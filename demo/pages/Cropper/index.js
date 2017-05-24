@@ -31,6 +31,10 @@ class Crop extends PureComponent {
         width: 600,
         height: 336
       },
+      cropped: {
+        width: 200,
+        height: 200
+      },
       croppedImg: ""
     };
     this.handleChange = this.handleChange.bind(this);
@@ -42,40 +46,55 @@ class Crop extends PureComponent {
     this.handleZoomOut = this.handleZoomOut.bind(this);
   }
   handleChange(data) {
-    this.setState({
-      form: {
-        originX: Number(data.originX),
-        originY: Number(data.originY),
-        width: Number(data.width),
-        height: Number(data.height)
-      }
-    });
+    this.setState(
+      {
+        form: {
+          originX: Number(data.originX),
+          originY: Number(data.originY),
+          width: Number(data.width),
+          height: Number(data.height)
+        }
+      },
+      this.handleCrop
+    );
   }
   handleCropperChange(data) {
     console.log("cropper", data);
-    this.setState({
-      form: {
-        originX: Number(data.x),
-        originY: Number(data.y),
-        width: Number(data.width),
-        height: Number(data.height)
-      }
-    });
+    this.setState(
+      {
+        form: {
+          originX: Number(data.x),
+          originY: Number(data.y),
+          width: Number(data.width),
+          height: Number(data.height)
+        }
+      },
+      this.handleCrop
+    );
   }
   handleCrop() {
+    const cropped = this.refs.cropper.values();
+
     this.setState({
-      croppedImg: this.refs.cropper.crop()
+      croppedImg: this.refs.cropper.crop(),
+      cropped: {
+        width: cropped.width,
+        height: cropped.height
+      }
     });
   }
   handleUpload(files) {
     const file = files[0];
-    this.setState({
-      image: file.thumb,
-      img: {
-        width: file.width,
-        height: file.height
-      }
-    });
+    this.setState(
+      {
+        image: file.thumb,
+        img: {
+          width: file.width,
+          height: file.height
+        }
+      },
+      this.handleCrop
+    );
   }
   handleDownload() {
     this.handleCrop();
@@ -91,21 +110,29 @@ class Crop extends PureComponent {
   handleZoomIn() {
     console.log("zoom in");
     const { ratio } = this.state;
-    this.setState({
-      ratio: ratio * 2
-    });
+    this.setState(
+      {
+        ratio: ratio * 2
+      },
+      this.handleCrop
+    );
   }
   handleZoomOut() {
     const { ratio } = this.state;
-    this.setState({
-      ratio: ratio / 2
-    });
+    this.setState(
+      {
+        ratio: ratio / 2
+      },
+      this.handleCrop
+    );
   }
   renderCropped(croppedImg) {
     return (
       <div
         style={{
-          backgroundColor: "#fff",
+          backgroundImage: "linear-gradient(to top right, #efefef 25%, transparent 25%, transparent 75%, #efefef 75%, #efefef),linear-gradient(to top right, #efefef 25%, transparent 25%, transparent 75%, #efefef 75%, #efefef)",
+          backgroundSize: "21px 21px",
+          backgroundPosition: "0 0,10px 10px",
           width: 200,
           height: 200,
           margin: "auto",
@@ -131,11 +158,12 @@ class Crop extends PureComponent {
     );
   }
   render() {
-    const { form, croppedImg, img, ratio } = this.state;
+    const { form, croppedImg, img, ratio, cropped } = this.state;
     const imgWidth = img.width * ratio;
     const imgHeight = img.height * ratio;
     console.log(
       "img",
+      croppedImg,
       img.width,
       img.height,
       imgWidth,
@@ -151,8 +179,50 @@ class Crop extends PureComponent {
             Upload Image
           </Upload>
         </div>
+        <Form
+          data={form}
+          onChange={this.handleChange}
+          style={{ paddingTop: "20px" }}
+          layout="inline"
+        >
+          <FormControl label="crop size:" labelWidth="100px">
+            <Input
+              type="number"
+              name="width"
+              placeholder="width"
+              defaultValue={200}
+              style={{ width: 120 }}
+            />
+            <span style={{ margin: "0 10px" }}>x</span>
+            <Input
+              type="number"
+              name="height"
+              placeholder="height"
+              defaultValue={200}
+              style={{ width: 120 }}
+            />
+          </FormControl>
+          <FormControl label="crop position:" labelWidth="150px">
+            <Input
+              style={{ width: 120 }}
+              type="number"
+              name="originX"
+              placeholder="X"
+              defaultValue={0}
+            />
+            <span style={{ margin: "0 10px" }}>x</span>
+            <Input
+              style={{ width: 120 }}
+              type="number"
+              name="originY"
+              placeholder="Y"
+              defaultValue={0}
+            />
+          </FormControl>
+
+        </Form>
         <Grid
-          width={1 / 2}
+          width={700 / 1000}
           style={{
             backgroundColor: "#fff",
             padding: 20,
@@ -198,54 +268,17 @@ class Crop extends PureComponent {
             </div>
           </div>
         </Grid>
-        <Grid width={1 / 2}>
-          <Form
-            data={form}
-            onChange={this.handleChange}
-            style={{ paddingTop: 20 }}
+        <Grid width={270 / 1000} offset={30 / 1000}>
+          <div
+            style={{
+              backgroundColor: "#fff",
+              padding: "50px 20px",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.07)"
+            }}
           >
-            <FormControl label="crop size:">
-              <Input
-                type="number"
-                name="width"
-                placeholder="width"
-                defaultValue={200}
-              />
-              <span style={{ margin: "0 10px" }}>x</span>
-              <Input
-                type="number"
-                name="height"
-                placeholder="height"
-                defaultValue={200}
-              />
-            </FormControl>
-            <FormControl label="crop position:">
-              <Input
-                type="number"
-                name="originX"
-                placeholder="X"
-                defaultValue={0}
-              />
-              <span style={{ margin: "0 10px" }}>x</span>
-              <Input
-                type="number"
-                name="originY"
-                placeholder="Y"
-                defaultValue={0}
-              />
-            </FormControl>
-            <FormControl label="">
-
-              <Button
-                onClick={this.handleCrop}
-                style={{
-                  backgroundColor: "#F289a6",
-                  color: "#fff",
-                  borderColor: "#F289a6"
-                }}
-              >
-                crop
-              </Button>
+            {this.renderCropped(croppedImg)}
+            <div style={{ textAlign: "center", marginTop: 20 }}>
+              <p>{cropped.width}*{cropped.height}</p>
               <Button
                 onClick={this.handleDownload}
                 style={{
@@ -256,10 +289,8 @@ class Crop extends PureComponent {
               >
                 Download
               </Button>
-
-            </FormControl>
-          </Form>
-          {this.renderCropped(croppedImg)}
+            </div>
+          </div>
         </Grid>
 
       </Grid>
